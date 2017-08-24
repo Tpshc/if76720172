@@ -9,7 +9,7 @@ def badchar(pat, ab):
     return bc
 
 
-def goodsuffix(pat):
+def goodsuffixbf(pat):
     m = len(pat)
     gs = (m+1)*[-1]
     for j in range(-1,m):
@@ -17,6 +17,33 @@ def goodsuffix(pat):
             if (k<=(m-j-1) and pat[:k]==pat[m-k:]) or (k>(m-j-1) and pat[j+1:]==pat[k-(m-j-1):k]):
                 gs[j+1] = k
     return gs
+
+
+def brd(pat):
+    m = len(pat)
+    nxt = (m+1)*[0] 
+    i = 1
+    j = 0
+    while i+j < m:
+        while i+j<m and pat[i+j]==pat[j]:
+            j += 1
+            nxt[i+j] = j
+        i += max(1, (j-nxt[j])) 
+        j = nxt[j]
+    return nxt
+
+
+def goodsuffix(pat):
+    m = len(pat)
+    B = brd(pat)
+    R = brd(pat[::-1])
+    S = (m+1)*[m-B[m]]
+    for l in range(1,m+1):
+        j = m-R[l] #m-1-R[l]+1
+        if l-R[l] < S[j]:
+            S[j] = l-R[l]
+    return S
+
 
 
 def boyermoore(txt, pat, ab):
@@ -36,12 +63,12 @@ def boyermoore(txt, pat, ab):
         #print
         if j<0:
             occ.append(i)
-            i+= m-gs[0]
+            i+= gs[0]
         else:
-            i += max(m-gs[j+1], j-bc[ab.index(txt[i+j])]) 
+            i += max(gs[j+1], j-bc[ab.index(txt[i+j])]) 
     return occ
 
-def oldmain():
+def amain():
     ab = [chr(i) for i in range(256)]
     pat = "beauty"
     txt = "That thereby beauty's rose might never die,"
