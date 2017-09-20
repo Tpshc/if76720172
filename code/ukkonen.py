@@ -1,5 +1,6 @@
 import sys
 
+
 def nextcolumn_orig(col, pat, a):
     m = len(pat)
     ncol = (m+1)*[0]
