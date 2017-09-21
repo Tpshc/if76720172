@@ -1,6 +1,47 @@
 import sys
 
+class BaseNode (object):
+    def __init__(self):
+        pass
 
+class Node (BaseNode):
+    def __init__(self):
+        BaseNode.__init__(self)
+        self.chd=[None,None,None]
+
+class Leaf (BaseNode):
+    def __init__(self, idx):
+        BaseNode.__init__(self)
+        self.idx = idx
+
+def Qinsert(root, s, idx):
+    newnode = False
+    m = len(s)-1
+    cur = root
+    i = 1
+    while i <= m:
+        if cur.chd[s[i]-s[i-1]]:
+            cur = cur.chd[s[i]-s[i-1]]
+            i += 1
+        else:
+            break
+    while i < m:
+        n = Node()
+        cur.chd[s[i]-s[i-1]] = n
+        cur = n
+        i+=1        
+    
+    if i==m:
+        l = Leaf(idx)
+        cur.chd[s[i]-s[i-1]] = l
+        cur = l
+        newnode = True
+        
+    return cur, newnode
+        
+		
+		
+		
 def nextcolumn_orig(col, pat, a):
     m = len(pat)
     ncol = (m+1)*[0]
@@ -42,6 +83,31 @@ def build_fsm(pat, ab, err):
             inxt = Q[snxt]
             delta[(i,a)] = inxt
     return(delta, F)
+
+
+def build_fsm2(pat, ab, err):
+    m = len(pat)
+    s = tuple(range(m+1))
+    idx = 0
+    queue = [(s,idx)]
+    Q = Node()
+    F = set()
+    delta = {}
+    if m<=err:
+        F.add(idx)
+    while queue:
+        (s,i) = queue.pop(0)
+        for a in ab:
+            snxt = nextcolumn(s, pat, a, err)
+            node, newnode = Qinsert(Q, snxt, idx+1)
+	    if newnode:
+                idx += 1
+                queue.append((snxt,node.idx))
+                if snxt[m]<=err:
+                    F.add(idx)
+            delta[(i,a)] = node.idx
+    return(delta, F)
+
 
 
 def scan(txt, fsm):
